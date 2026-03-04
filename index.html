@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Y2K38-ASEAN Cyber-Core | Huokaing Thara</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Kantumruy+Pro:wght@400;700&display=swap');
+
+    :root {
+        --holo-cyan: #00d4ff;
+        --alert-red: #ff0000;
+        --glow-cyan: rgba(0, 212, 255, 0.7);
+    }
+
+    body {
+        background: #000;
+        color: #fff;
+        font-family: 'Orbitron', 'Kantumruy Pro', sans-serif;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    #binary-canvas {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: -1;
+        opacity: 0.15;
+    }
+
+    main.cyber-container {
+        position: relative;
+        width: 85vw;
+        max-width: 850px;
+        height: 85vh;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 0%, rgba(0, 0, 0, 0.98) 90%);
+        border-radius: 50%;
+        box-sizing: border-box;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(15px);
+        animation: float 6s ease-in-out infinite;
+        /* HOLOGRAM GLOW */
+        box-shadow:
+            0 0 20px var(--glow-cyan),
+            0 0 40px var(--glow-cyan),
+            inset 0 0 70px var(--glow-cyan),
+            inset 0 0 100px var(--glow-cyan);
+        border: 1px solid var(--glow-cyan);
+        overflow: hidden;
+    }
+
+    /* animated hologram border ring */
+    main.cyber-container::before {
+        content: "";
+        position: absolute;
+        top: -10px; left: -10px; right: -10px; bottom: -10px;
+        border-radius: 50%;
+        pointer-events: none;
+        box-shadow: 0 0 30px var(--glow-cyan);
+        animation: holoPulse 4s linear infinite;
+        z-index: 0;
+    }
+
+    @keyframes holoPulse {
+        0%, 100% {
+            box-shadow:
+                0 0 10px var(--glow-cyan),
+                0 0 30px var(--glow-cyan),
+                0 0 50px var(--glow-cyan),
+                0 0 70px var(--glow-cyan);
+        }
+        50% {
+            box-shadow:
+                0 0 20px var(--glow-cyan),
+                0 0 50px var(--glow-cyan),
+                0 0 80px var(--glow-cyan),
+                0 0 100px var(--glow-cyan);
+        }
+    }
+
+    .lang-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 5px;
+        position: absolute;
+        top: 5%;
+        width: 90%;
+        z-index:10;
+    }
+
+    .lang-btn {
+        background: transparent;
+        border: 1px solid var(--holo-cyan);
+        color: var(--holo-cyan);
+        font-size: 0.6rem;
+        cursor: pointer;
+        padding: 4px;
+        transition: 0.3s;
+        font-family: 'Orbitron';
+        user-select: none;
+    }
+
+    .lang-btn:hover,
+    .lang-btn.active {
+        background: var(--holo-cyan);
+        color: #000;
+    }
+
+    .data-display {
+        width: 75%;
+        max-height: 35%;
+        overflow-y: auto;
+        margin-top: 10px;
+        scrollbar-width: none;
+    }
+
+    /* Hover tooltip container */
+    .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 10px;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        transition: 0.4s;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .data-row:hover {
+        transform: scale(1.05);
+        background: rgba(0, 212, 255, 0.15);
+        color: var(--holo-cyan);
+    }
+    /* Tooltip text */
+    .tooltip-text {
+        visibility: hidden;
+        width: 200px;
+        background-color: rgba(0, 212, 255, 0.9);
+        color: black;
+        text-align: center;
+        border-radius: 6px;
+        padding: 6px;
+        position: absolute;
+        z-index: 1001;
+        bottom: 120%;
+        left: 50%;
+        margin-left: -100px;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        user-select:none;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .data-row:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    #breach-overlay {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 0, 0, 0.3) 0%, transparent 70%);
+        border: 4px solid var(--alert-red);
+        z-index: 1000;
+        pointer-events: none;
+    }
+
+    .horror-text {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--alert-red);
+        font-size: 2rem;
+        text-shadow: 0 0 20px red;
+        text-align: center;
+        user-select:none;
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+
+    select {
+        background: #000;
+        color: var(--holo-cyan);
+        border: 1px solid var(--holo-cyan);
+        padding: 8px;
+        border-radius: 20px;
+        font-family: 'Orbitron';
+        width: 280px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        user-select:none;
+    }
+
+    #mute-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--holo-cyan);
+        border: none;
+        padding: 10px 15px;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+        border-radius: 30px;
+        cursor: pointer;
+        color: #000;
+        user-select:none;
+        z-index: 1500;
+        box-shadow: 0 0 10px var(--holo-cyan);
+        transition: background 0.3s ease;
+    }
+    #mute-btn:hover {
+        background: #00a9cc;
+    }
+</style>
+</head>
+<body>
+<canvas id="binary-canvas"></canvas>
+
+<main class="cyber-container" id="main-frame" aria-label="ASEAN Cyber Security Interface">
+    <div id="breach-overlay" aria-live="assertive" aria-atomic="true" aria-relevant="additions">
+        <div class="horror-text" id="alert-msg">FATAL_ERROR</div>
+    </div>
+
+    <div class="lang-grid" role="group" aria-label="Select Language">
+        <button class="lang-btn active" onclick="setLang('en', event)" aria-pressed="true">EN</button>
+        <button class="lang-btn" onclick="setLang('kh', event)" aria-pressed="false">KH</button>
+        <button class="lang-btn" onclick="setLang('th', event)" aria-pressed="false">TH</button>
+        <button class="lang-btn" onclick="setLang('vn', event)" aria-pressed="false">VN</button>
+        <button class="lang-btn" onclick="setLang('id', event)" aria-pressed="false">ID</button>
+        <button class="lang-btn" onclick="setLang('my', event)" aria-pressed="false">MY</button>
+        <button class="lang-btn" onclick="setLang('ph', event)" aria-pressed="false">PH</button>
+        <button class="lang-btn" onclick="setLang('la', event)" aria-pressed="false">LA</button>
+        <button class="lang-btn" onclick="setLang('bn', event)" aria-pressed="false">BN</button>
+        <button class="lang-btn" onclick="setLang('mm', event)" aria-pressed="false">MM</button>
+        <button class="lang-btn" onclick="setLang('tl', event)" aria-pressed="false">TL</button>
+    </div>
+
+    <header style="text-align: center; margin-top: 40px;">
+        <h1 id="title">CYBER-SECURITY CORE</h1>
+        <p id="live-timer" style="font-size: 0.6rem; color: #555;" aria-live="polite" aria-atomic="true" aria-relevant="text">
+            SCANNING...
+        </p>
+    </header>
+
+    <select id="country-select" onchange="calculateAudit()" aria-label="Select Country">
+        <option value="1.5">SINGAPORE</option>
+        <option value="1.3">BRUNEI</option>
+        <option value="1.1">MALAYSIA</option>
+        <option value="1.1">THAILAND</option>
+        <option value="1.0">INDONESIA</option>
+        <option value="1.0">VIETNAM</option>
+        <option value="1.0">PHILIPPINES</option>
+        <option value="0.8" selected>CAMBODIA</option>
+        <option value="0.7">LAOS</option>
+        <option value="0.7">TIMOR-LESTE</option>
+        <option value="1.0">MYANMAR (DANGER)</option>
+    </select>
+
+    <div class="data-display" id="data-list" role="list" aria-label="Security audit steps"></div>
+
+    <div style="text-align: center; margin-top: 15px;">
+        <div id="total-label" style="font-size: 0.8rem; color: #8b949e;">TOTAL AUDIT</div>
+        <div id="final-total" style="font-size: 2.2rem; color: var(--holo-cyan)">$0</div>
+    </div>
+
+    <footer style="margin-top: 20px; font-size: 0.6rem; color: #444; text-align: center;">
+        <span id="footer-text">ARCHITECT:</span>
+        <span class="author-tag">HUOKAING THARA</span>
+    </footer>
+</main>
+
+<button id="mute-btn" aria-pressed="false" aria-label="Mute background music">Mute Music</button>
+
+<audio id="background-music" src="https://cdn.pixabay.com/download/audio/2022/03/22/audio_2b8248a367.mp3?filename=spy-tech-background-4946.mp3" loop autoplay muted></audio>
+
+<script>
+    // Disable F12, Ctrl+Shift+I/J/C and right-click
+    document.addEventListener('keydown', (e) => {
+        if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === 'U')
+        ) {
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    const translations = {
+        en: {
+            title: "CYBER-SECURITY CORE",
+            alert: "CRITICAL BREACH",
+            label: "TOTAL COST",
+            foot: "ARCHITECT:",
+            steps: [
+                { name: "THREAT MODEL", desc: "Identify and assess potential dangers to system assets." },
+                { name: "BINARY AUDIT", desc: "Evaluate compiled code for anomalies or backdoors." },
+                { name: "PEN TEST", desc: "Simulate attacks to detect vulnerabilities." },
+                { name: "ABI CHECK", desc: "Verify Application Binary Interface integrity." }
+            ]
+        },
+        kh: {
+            title: "ស្នូលសន្តិសុខសាយប័រ",
+            alert: "ការជ្រៀតជ្រែកធ្ងន់ធ្ងរ",
+            label: "តម្លៃសរុប",
+            foot: "ស្ថាបត្យករ៖",
+            steps: [
+                { name: "គំរូការគំរាមកំហែង", desc: "កំណត់និងវាយតម្លៃគំរូការគំរាមកំហែង។" },
+                { name: "សវនកម្មប៊ីណារី", desc: "វាយតម្លៃកូដបញ្ចូលសម្រាប់ករណីមិនធម្មតា។" },
+                { name: "តេស្តជ្រៀតចូល", desc: "សម្តែងការវាយប្រហារដើម្បីរកកំហុសប្រហារណ៏។" },
+                { name: "ពិនិត្យ ABI", desc: "ផ្ទៀងផ្ទាត់ភាពត្រឹមត្រូវនៃ ABI។" }
+            ]
+        },
+        th: {
+            title: "แกนหลักความปลอดภัยไซเบอร์",
+            alert: "การละเมิดร้ายแรง",
+            label: "ราคารวม",
+            foot: "สถาปนิก:",
+            steps: [
+                { name: "แบบจำลองภัยคุกคาม", desc: "ระบุและประเมินอันตรายที่อาจเกิดขึ้นกับระบบ." },
+                { name: "การตรวจสอบไบนารี", desc: "ประเมินโค้ดที่คอมไพล์แล้วเพื่อหาความผิดปกติ." },
+                { name: "การทดสอบเจาะระบบ", desc: "จำลองการโจมตีเพื่อค้นหาช่องโหว่." },
+                { name: "ตรวจสอบ ABI", desc: "ตรวจสอบความสมบูรณ์ของ ABI." }
+            ]
+        },
+        vn: {
+            title: "LÕI AN NINH MẠNG",
+            alert: "VI PHẠM NGHIÊM TRỌNG",
+            label: "TỔNG CHI PHÍ",
+            foot: "KIẾN TRÚC SƯ:",
+            steps: [
+                { name: "MÔ HÌNH ĐE DỌA", desc: "Xác định và đánh giá các nguy cơ tiềm ẩn." },
+                { name: "KIỂM TRA NHỊ PHÂN", desc: "Đánh giá mã nhị phân để phát hiện dị thường." },
+                { name: "KIỂM THỬ XÂM NHẬP", desc: "Mô phỏng tấn công để tìm lỗ hổng." },
+                { name: "KIỂM TRA ABI", desc: "Xác minh sự toàn vẹn của ABI." }
+            ]
+        },
+        id: {
+            title: "INTI KEAMANAN SIBER",
+            alert: "PELANGGARAN KRITIS",
+            label: "TOTAL BIAYA",
+            foot: "ARSITEK:",
+            steps: [
+                { name: "MODEL ANCAMAN", desc: "Identifikasi dan evaluasi potensi ancaman sistem." },
+                { name: "AUDIT BINER", desc: "Memeriksa kode hasil kompilasi untuk anomali." },
+                { name: "UJI PENETRASI", desc: "Simulasi serangan untuk menemukan kelemahan." },
+                { name: "CEK ABI", desc: "Memastikan integritas ABI." }
+            ]
+        },
+        my: {
+            title: "TERAS KESELAMATAN SIBER",
+            alert: "PELANGGARAN KRITIKAL",
+            label: "JUMLAH KOS",
+            foot: "ARKITEK:",
+            steps: [
+                { name: "MODEL ANCAMAN", desc: "Kenal pasti dan nilaikan ancaman berpotensi." },
+                { name: "AUDIT BINARI", desc: "Semak kod binari bagi sebarang anomali." },
+                { name: "UJIAN PENETRASI", desc: "Simulasi serangan untuk cari kelemahan." },
+                { name: "SEMAKAN ABI", desc: "Sahkan integriti ABI." }
+            ]
+        },
+        ph: {
+            title: "CORE NG CYBER-SECURITY",
+            alert: "KRITIKAL NA PAGLABAG",
+            label: "KABUUANG HALAGA",
+            foot: "ARKITEKTO:",
+            steps: [
+                { name: "MODEL NG BANTA", desc: "Tukuyin at tasahin ang mga potensyal na banta." },
+                { name: "BINARY AUDIT", desc: "Suriin ang mga binary code para sa anomalya." },
+                { name: "PENETRATION TEST", desc: "Gawin ang simulated na pag-atake para matuklasan ang kahinaan." },
+                { name: "ABI CHECK", desc: "Beripikahin ang integridad ng ABI." }
+            ]
+        },
+        la: {
+            title: "ແກນຄວາມປອດໄພໄຊເບີ",
+            alert: "ການລະເມີດທີ່ຮ້າຍແຮງ",
+            label: "ລາຄາທັງຫມົດ",
+            foot: "ສະຖາປະນິກ:",
+            steps: [
+                { name: "ແບບຈໍາລອງໄພຂົ່ມຂູ່", desc: "ກຳນົດແລະປະເມີນອັນຕະລາຍທີ່ອາດເກີດ." },
+                { name: "ການກວດສອບໄບນາຣີ", desc: "ກວດສອບໂຄດໄບນາຣີສຳລັບວິຊາການ." },
+                { name: "ການທົດສອບເຈາະລະບົບ", desc: "ຈົດທົດສອບການຮ້າຍ." },
+                { name: "ກວດສອບ ABI", desc: "ກວດສອບຄວາມຖືກຕ້ອງຂອງ ABI." }
+            ]
+        },
+        bn: {
+            title: "TERAS KESELAMATAN SIBER",
+            alert: "PELANGGARAN KRITIKAL",
+            label: "JUMLAH KOS",
+            foot: "ARKITEK:",
+            steps: [
+                { name: "MODEL ANCAMAN", desc: "Kenal pasti dan nilaikan ancaman berpotensi." },
+                { name: "AUDIT BINARI", desc: "Semak kod binari bagi sebarang anomali." },
+                { name: "UJIAN PENETRASI", desc: "Simulasi serangan untuk cari kelemahan." },
+                { name: "SEMAKAN ABI", desc: "Sahkan integriti ABI." }
+            ]
+        },
+        mm: {
+            title: "ဆိုက်ဘာလုံခြုံရေး ဗဟိုချက်",
+            alert: "ပြင်းထန်သော ချိုးဖောက်မှု",
+            label: "စုစုပေါင်းကုန်ကျစရိတ်",
+            foot: "ဗိသုကာပညာရှင်:",
+            steps: [
+                { name: "ခြိမ်းခြောက်မှုပုံစံ", desc: "စနစ်အမျိုးမျိုးအတွက် ရှုမြင်မှု။" },
+                { name: "ဘိုင်နရီ စစ်ဆေးခြင်း", desc: "ဘိုင်နရီကုဒ်များကို စစ်ဆေးခြင်း။" },
+                { name: "ထိုးဖောက်စမ်းသပ်မှု", desc: "ရှာဖွေမှုစမ်းသပ်ခြင်း။" },
+                { name: "ABI စစ်ဆေးခြင်း", desc: "ABI မှန်ကန်မှု စစ်ဆေးခြင်း။" }
+            ]
+        },
+        tl: {
+            title: "NÚCLEO DE CIBERSEGURANÇA",
+            alert: "VIOLAÇÃO CRÍTICA",
+            label: "CUSTO TOTAL",
+            foot: "ARQUITETO:",
+            steps: [
+                { name: "MODELO DE AMEAÇA", desc: "Identifique e avalie ameaças potenciais." },
+                { name: "AUDITORIA BINÁRIA", desc: "Avalie o código binário por anomalias." },
+                { name: "TESTE DE PENETRAÇÃO", desc: "Simule ataques para encontrar vulnerabilidades." },
+                { name: "VERIFICAÇÃO ABI", desc: "Verifique a integridade do ABI." }
+            ]
+        }
+    };
+
+    let currentL = "en";
+    let audioCtx = null;
+    const synth = window.speechSynthesis;
+    const dnsLink = "https://tharahuokaing.github.io/Y2K38_Problem/";
+
+    // --- SPEECH ---
+    function speakText(text, isHorror = false) {
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = currentL === "kh" ? "km-KH" : "en-US";
+        utter.pitch = isHorror ? 0.1 : 1.0;
+        utter.rate = isHorror ? 0.5 : 1.0;
+        utter.volume = 1.0;
+        synth.speak(utter);
+    }
+
+    // --- BINARY RAIN ---
+    const canvas = document.getElementById("binary-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const drops = Array(Math.floor(canvas.width / 14)).fill(1);
+    function drawB() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = document.getElementById("main-frame").classList.contains("breach-active") ? "#f00" : "#0f0";
+        ctx.font = "14px Orbitron";
+        drops.forEach((y, i) => {
+            ctx.fillText(Math.floor(Math.random() * 2), i * 14, y * 14);
+            if (y * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(drawB, 33);
+
+    // --- FREQUENCY AUDIO ---
+    function playH() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+    }
+
+    function setLang(l, event) {
+        currentL = l;
+        document.querySelectorAll(".lang-btn").forEach((b) => {
+            b.classList.remove("active");
+            b.setAttribute("aria-pressed", "false");
+        });
+        if (event && event.target) {
+            event.target.classList.add("active");
+            event.target.setAttribute("aria-pressed", "true");
+        }
+        const t = translations[l];
+        document.getElementById("title").innerText = t.title;
+        document.getElementById("total-label").innerText = t.label;
+        document.getElementById("footer-text").innerText = t.foot;
+        document.getElementById("alert-msg").innerText = t.alert;
+        speakText(t.title);
+        calculateAudit();
+    }
+
+    function calculateAudit() {
+        const sel = document.getElementById("country-select");
+        const mult = parseFloat(sel.value);
+        const countryText = sel.options[sel.selectedIndex].text;
+
+        if (countryText.includes("MYANMAR")) {
+            document.getElementById("main-frame").classList.add("breach-active");
+            document.getElementById("breach-overlay").style.display = "block";
+            speakText(translations[currentL].alert, true);
+            let c = 0;
+            const t = setInterval(() => {
+                playH();
+                c++;
+                if (c > 10) {
+                    clearInterval(t);
+                    document.getElementById("main-frame").classList.remove("breach-active");
+                    document.getElementById("breach-overlay").style.display = "none";
+                }
+            }, 100);
+        } else {
+            speakText(countryText);
+        }
+
+        const list = document.getElementById("data-list");
+        list.innerHTML = "";
+        let tot = 0;
+        const costs = [6000, 4000, 18000, 9000];
+        translations[currentL].steps.forEach(({ name, desc }, i) => {
+            const c = costs[i] * mult;
+            tot += c;
+            const r = document.createElement("div");
+            r.className = "data-row";
+            r.setAttribute("role", "listitem");
+            r.innerHTML = `<span>${name}</span><span>$${c.toLocaleString()}</span><div class="tooltip-text">${desc}</div>`;
+            r.onclick = (e) => {
+                e.stopPropagation();
+                // On clicking tool name, open external DNS link:
+                window.open(dnsLink, '_blank', 'noopener');
+                // And speak the tool cost
+                speakText(name + " cost is " + c + " dollars");
+            };
+            list.appendChild(r);
+        });
+        document.getElementById("final-total").innerText = `$${Math.round(tot * (0.98 + Math.random() * 0.04)).toLocaleString()}`;
+    }
+
+    // Timer live ID display update
+    setInterval(() => {
+        document.getElementById("live-timer").innerText = `T: ${new Date().toLocaleTimeString()} | ID: THARA_${Math.random()
+            .toString(16)
+            .slice(2, 6)
+            .toUpperCase()}`;
+    }, 1000);
+
+    // Initialization
+    calculateAudit();
+
+    // Mute button toggle for background music
+    const bgMusic = document.getElementById('background-music');
+    const muteBtn = document.getElementById('mute-btn');
+    muteBtn.addEventListener('click', () => {
+        if (bgMusic.muted) {
+            bgMusic.muted = false;
+            muteBtn.innerText = "Mute Music";
+            muteBtn.setAttribute('aria-pressed', 'false');
+        } else {
+            bgMusic.muted = true;
+            muteBtn.innerText = "Unmute Music";
+            muteBtn.setAttribute('aria-pressed', 'true');
+        }
+    });
+</script>
+</body>
+</html>
